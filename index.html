@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCC COIN SAMPLE</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .photo-container {
+            text-align: center;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        .email-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>NCC COIN SAMPLE</h1>
+    
+    <div class="gallery">
+        <div class="photo-container">
+            <img src="/api/placeholder/400/300" alt="照片 1">
+            <p>照片 1 的描述</p>
+        </div>
+        <div class="photo-container">
+            <img src="/api/placeholder/400/300" alt="照片 2">
+            <p>照片 2 的描述</p>
+        </div>
+        <div class="photo-container">
+            <img src="/api/placeholder/400/300" alt="照片 3">
+            <p>照片 3 的描述</p>
+        </div>
+    </div>
+    
+    <a href="mailto:author@example.com" class="email-link">聯繫作者</a>
+</body>
+</html>
