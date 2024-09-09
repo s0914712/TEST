@@ -8,7 +8,7 @@ class ImgurUploader:
     def upload_image(self, event):
         input_elem = document['imageInput']
         if not input_elem.files:
-            window.alert('請選擇一個圖片文件')
+            window.alert('Choose your file')
             return
         
         file = input_elem.files[0]
@@ -30,11 +30,11 @@ class ImgurUploader:
         if req.status == 200:
             response = json.loads(req.text)
             image_url = response['data']['link']
-            document['result'].innerHTML = f'上傳成功！圖片URL: <a href="{image_url}" target="_blank">{image_url}</a>'
+            document['result'].innerHTML = f'Uploaded！URL: <a href="{image_url}" target="_blank">{image_url}</a>'
             document['imagePreview'].attrs['src'] = image_url
         else:
-            print('上傳失敗:', req.text)
-            document['result'].innerHTML = '上傳失敗，請稍後再試。'
+            print('Fail:', req.text)
+            document['result'].innerHTML = 'Fail try again later。'
 
 uploader = ImgurUploader()
 
