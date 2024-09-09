@@ -120,7 +120,7 @@ class ImgurUploader:
             self._add_image_to_gallery(image_url)
             self._save_image_url(image_url)
         else:
-            print('上傳失敗:', req.text)
+            print('Fail:', req.text)
             document['result'].innerHTML = 'Upload Fail。'
 
     def _add_image_to_gallery(self, image_url):
