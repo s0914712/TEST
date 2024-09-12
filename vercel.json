@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "generate_image.py",
+      "src": "/api/generate_image.py",
       "use": "@vercel/python"
     }
   ],
