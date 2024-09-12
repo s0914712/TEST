@@ -144,7 +144,7 @@
 
         class DALLEGenerator:
             def __init__(self):
-                self.api_url = "http://localhost:5000/generate-image"  # Change to your backend URL
+                self.api_url = "https://your-vercel-app-url.vercel.app/generate-image"
 
             def generate_image(self, event):
                 prompt = document['promptInput'].value
