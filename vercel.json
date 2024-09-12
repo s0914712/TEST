@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "vc__handler__python.py",
+      "src": "generate_image.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "vc__handler__python.py"
+      "dest": "generate_image.py"
     }
   ]
 }
