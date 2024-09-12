@@ -3,14 +3,10 @@ from openai import OpenAI
 import os
 from flask_cors import CORS
 
-
 app = Flask(__name__)
-CORS(app, resources={r"/generate-image": {"origins": "http://localhost:8000"}})
+CORS(app)  # 允許所有來源
 
-# 設置 OpenAI API 密鑰
 client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
-
-
 
 @app.route('/generate-image', methods=['POST'])
 def generate_image():
