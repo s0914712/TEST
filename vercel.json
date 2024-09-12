@@ -8,6 +8,10 @@
   ],
   "routes": [
     {
+      "src": "/generate_image",
+      "dest": "generate_image.py"
+    },
+    {
       "src": "/(.*)",
       "dest": "generate_image.py"
     }
