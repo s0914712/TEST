@@ -4,7 +4,7 @@ import os
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # 允許所有來源
+CORS(app)
 
 client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
 
