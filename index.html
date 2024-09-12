@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,12 +29,12 @@
             max-width: 100%;
             height: auto;
         }
-        .upload-section {
+        .upload-section, .generate-section {
             text-align: center;
             margin-top: 30px;
             margin-bottom: 30px;
         }
-        #imagePreview {
+        #imagePreview, #generatedImage {
             max-width: 300px;
             margin-top: 20px;
         }
@@ -43,8 +43,12 @@
             text-align: center;
             margin-top: 20px;
         }
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
     </style>
-    <!-- 引入 Brython 程式庫 -->
     <script src="https://cdn.jsdelivr.net/npm/brython@3/brython.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/brython@3/brython_stdlib.js"></script>
 </head>
@@ -53,114 +57,142 @@
     
     <div class="gallery">
         <div class="photo-container">
-            <a href="https://imgur.com/0cxg6lQ"><img src="https://i.imgur.com/0cxg6lQ.png" title="source: imgur.com" /></a>
-            <p>every boday united</p>
+            <a href="https://imgur.com/0cxg6lQ"><img src="https://i.imgur.com/0cxg6lQ.png" title="source: imgur.com" alt="every body united" /></a>
+            <p>every body united</p>
         </div>
         <div class="photo-container">
-            <a href="https://imgur.com/vWActHq"><img src="https://i.imgur.com/vWActHq.png" title="source: imgur.com" /></a>
+            <a href="https://imgur.com/vWActHq"><img src="https://i.imgur.com/vWActHq.png" title="source: imgur.com" alt="We are the World" /></a>
             <p>We are the World</p>
         </div>
         <div class="photo-container">
-            <img src="https://i.imgur.com/0sFAiD2.png" alt="照片 3">
+            <img src="https://i.imgur.com/0sFAiD2.png" alt="Photo 3">
             <p>Salute</p>
         </div>
     </div>
     
-    <h2>PIC uploaded</h2>
+    <h2>User Uploaded Images</h2>
     <div class="gallery" id="imageGallery">
-        <!-- Uploaded pic show here -->
+        <!-- Dynamically added images will be displayed here -->
     </div>
     
     <div class="upload-section">
-        <h2>UPload your idea</h2>
+        <h2>Upload Your Ideas</h2>
         <input type="file" id="imageInput" accept="image/*">
-        <button id="uploadButton">Upload</button>
+        <button id="uploadButton">Upload Image</button>
         <div id="result"></div>
-        <img id="imagePreview" src="" alt="Preview">
+        <img id="imagePreview" src="" alt="Preview Image">
+    </div>
+    
+    <div class="generate-section">
+        <h2>Generate Image</h2>
+        <input type="text" id="promptInput" placeholder="Enter prompt">
+        <button id="generateButton">Generate Image</button>
+        <div id="loading">Generating image, please wait...</div>
+        <div id="generatedResult"></div>
+        <img id="generatedImage" src="" alt="Generated Image">
     </div>
     
     <a href="mailto:s0914712@gmail.com" class="email-link">Send your Ideas by mail</a>
-    <h1>mail to:s0914712@gmail.com</h1>
+    <h2>mail to: s0914712@gmail.com</h2>
     <h2><a href="https://www.surveycake.com/s/2XeYr">Survey and vote</a></h2>
 
     <script type="text/python">
-from browser import document, ajax, window, html
-import json
+        from browser import document, ajax, window, html
+        import json
 
-class ImgurUploader:
-    def __init__(self):
-        self.client_id = 'a0f19779af81cc0'  # 請替換為您的Imgur Client ID
-    
-    def upload_image(self, event):
-        input_elem = document['imageInput']
-        if not input_elem.files:
-            window.alert('Choose from your file')
-            return
-        
-        file = input_elem.files[0]
-        reader = window.FileReader.new()
-        reader.readAsDataURL(file)
-        reader.bind('load', lambda e: self._send_to_imgur(e.target.result))
+        class ImgurUploader:
+            def __init__(self):
+                self.client_id = 'a0f19779af81cc0'  # Please replace with your Imgur Client ID
 
-    def _send_to_imgur(self, base64_image):
-        image_data = base64_image.split(',')[1]
-        
-        req = ajax.Ajax()
-        req.bind('complete', self._on_complete)
-        req.open('POST', 'https://api.imgur.com/3/image')
-        req.set_header('Authorization', f'Client-ID {self.client_id}')
-        req.send({'image': image_data})
+            def upload_image(self, event):
+                input_elem = document['imageInput']
+                if not input_elem.files:
+                    window.alert('Please select an image file')
+                    return
 
-    def _on_complete(self, req):
-        if req.status == 200:
-            response = json.loads(req.text)
-            image_url = response['data']['link']
-            document['result'].innerHTML = f'Upload successful！'
-            document['imagePreview'].attrs['src'] = image_url
-            self._add_image_to_gallery(image_url)
-            self._save_image_url(image_url)
-        else:
-            print('Fail:', req.text)
-            document['result'].innerHTML = 'Upload Fail。'
+                file = input_elem.files[0]
+                reader = window.FileReader.new()
+                reader.readAsDataURL(file)
+                reader.bind('load', lambda e: self._send_to_imgur(e.target.result))
 
-    def _add_image_to_gallery(self, image_url):
-        gallery = document['imageGallery']
-        container = html.DIV(Class="photo-container")
-        img = html.IMG(src=image_url, alt="your uploaded pic")
-        container <= img
-        gallery.insertBefore(container, gallery.firstChild)
+            def _send_to_imgur(self, base64_image):
+                image_data = base64_image.split(',')[1]
 
-    def _save_image_url(self, image_url):
-        current_images = json.loads(window.localStorage.getItem('uploadedImages') or '[]')
-        current_images.insert(0, image_url)
-        if len(current_images) > 9:  # 限制最多顯示9張圖片
-            current_images = current_images[:9]
-        window.localStorage.setItem('uploadedImages', json.dumps(current_images))
+                req = ajax.Ajax()
+                req.bind('complete', self._on_complete)
+                req.open('POST', 'https://api.imgur.com/3/image')
+                req.set_header('Authorization', f'Client-ID {self.client_id}')
+                req.send({'image': image_data})
 
-def init():
-    uploader = ImgurUploader()
-    document['uploadButton'].bind('click', uploader.upload_image)
-    document['imageInput'].bind('change', preview_image)
-    load_saved_images()
+            def _on_complete(self, req):
+                if req.status == 200:
+                    response = json.loads(req.text)
+                    image_url = response['data']['link']
+                    document['result'].innerHTML = f'Upload successful!'
+                    document['imagePreview'].attrs['src'] = image_url
+                    self._add_image_to_gallery(image_url)
+                else:
+                    print('Upload failed:', req.text)
+                    document['result'].innerHTML = 'Upload failed, please try again later.'
 
-def preview_image(event):
-    file = event.target.files[0]
-    if file:
-        reader = window.FileReader.new()
-        reader.readAsDataURL(file)
-        reader.bind('load', lambda e: setattr(document['imagePreview'], 'src', e.target.result))
+            def _add_image_to_gallery(self, image_url):
+                gallery = document['imageGallery']
+                container = html.DIV(Class="photo-container")
+                img = html.IMG(src=image_url, alt="Uploaded Image")
+                container <= img
+                gallery.insertBefore(container, gallery.firstChild)
 
-def load_saved_images():
-    saved_images = json.loads(window.localStorage.getItem('uploadedImages') or '[]')
-    gallery = document['imageGallery']
-    for image_url in saved_images:
-        container = html.DIV(Class="photo-container")
-        img = html.IMG(src=image_url, alt="Saved pic")
-        container <= img
-        gallery <= container
+        class DALLEGenerator:
+            def __init__(self):
+                self.api_url = "http://localhost:5000/generate-image"  # Change to your backend URL
 
-# 初始化
-init()
+            def generate_image(self, event):
+                prompt = document['promptInput'].value
+                if not prompt:
+                    window.alert('Please enter a prompt')
+                    return
+
+                document['loading'].style.display = 'block'
+                document['generatedResult'].innerHTML = ''
+                document['generatedImage'].attrs['src'] = ''
+
+                def on_complete(req):
+                    document['loading'].style.display = 'none'
+                    if req.status == 200:
+                        response = json.loads(req.text)
+                        image_url = response.get('image_url')
+                        if image_url:
+                            document['generatedResult'].innerHTML = 'Generation successful!'
+                            document['generatedImage'].attrs['src'] = image_url
+                        else:
+                            document['generatedResult'].innerHTML = 'Generation failed, please try again later.'
+                    else:
+                        print('Generation failed:', req.text)
+                        document['generatedResult'].innerHTML = 'Generation failed, please try again later.'
+
+                req = ajax.Ajax()
+                req.bind('complete', on_complete)
+                req.open('POST', self.api_url)
+                req.set_header('Content-Type', 'application/json')
+                req.send(json.dumps({'prompt': prompt}))
+
+        uploader = ImgurUploader()
+        generator = DALLEGenerator()
+
+        def init():
+            document['uploadButton'].bind('click', uploader.upload_image)
+            document['imageInput'].bind('change', preview_image)
+            document['generateButton'].bind('click', generator.generate_image)
+
+        def preview_image(event):
+            file = event.target.files[0]
+            if file:
+                reader = window.FileReader.new()
+                reader.readAsDataURL(file)
+                reader.bind('load', lambda e: setattr(document['imagePreview'], 'src', e.target.result))
+
+        # Initialize
+        init()
     </script>
 </body>
 </html>
