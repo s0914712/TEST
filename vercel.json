@@ -1,13 +1,14 @@
 {
   "version": 2,
+  "builds": [
+    {
+      "src": "generate-image.py",
+      "use": "@vercel/python"
+    }
+  ],
   "routes": [
     {
-      "src": "/api/generate_image",
-      "dest": "api/generate_image.py"
-    },
-    {
       "src": "/(.*)",
-      "dest": "api/generate_image.py"
+      "dest": "generate-image.py"
     }
   ]
-}
